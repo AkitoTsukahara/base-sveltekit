@@ -1,0 +1,26 @@
+services:
+  base-sveltekit:
+    container_name: base-sveltekit
+    build:
+      context: .
+      dockerfile: local.Dockerfile
+    ports:
+      # for storybook
+      - 9008:9008
+      - 3000:3000
+    volumes:
+      - .:/code
+      - /code/node_modules
+    networks:
+      - default
+      - docker_default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sveltekit.rule=Host(`localhost`)"
+      - "traefik.http.routers.sveltekit.entrypoints=web"
+    tty: true
+
+networks:
+  docker_default:
+    external: true
+    name: docker_default

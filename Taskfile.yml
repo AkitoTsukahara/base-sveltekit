@@ -1,0 +1,76 @@
+version: '3'
+
+tasks:
+  up:
+    desc: '開発環境の起動'
+    cmds:
+      - docker compose up -d
+  down:
+    desc: '開発環境の停止'
+    cmds:
+      - docker compose down
+  log:
+    desc: '開発環境コンテナ内のログ表示'
+    cmds:
+      - docker compose logs -f --tail=1000
+  npm:
+    desc: 'npmインストールを実行'
+    cmds:
+      - docker compose exec sveltekit bash -i -c "npm install"
+    sources:
+      - package.json
+      - package-lock.json
+    generates:
+      - node_modules/**
+  dev:
+    desc: 'devサーバーの起動'
+    deps: [up, npm]
+    cmds:
+      - docker compose exec sveltekit bash -i -c "npm run dev"
+  ssh:
+    desc: 'コンテナ内にログイン'
+    cmds:
+      - docker compose exec sveltekit bash -i
+  build:
+    desc: '本番用ビルド'
+    cmds:
+      - docker compose exec sveltekit bash -i -c "npm run build"
+  test:
+    desc: 'Vitest実行'
+    cmds:
+      - docker compose exec sveltekit bash -i -c "npm run test"
+  storybook:
+    desc: 'Storybookの起動'
+    cmds:
+      - docker compose exec sveltekit bash -i -c "npm run storybook"
+  lint:
+    desc: 'ESLint実行'
+    cmds:
+      - docker compose exec sveltekit bash -i -c "npm run lint"
+  format:
+    desc: 'mainブランチとの差分ファイルに関してコードフォーマットを実行'
+    cmds:
+      - docker compose exec sveltekit bash -i -c "npm run format:local"
+      - docker compose exec sveltekit bash -i -c "npm run eslint:local"
+      - docker compose exec sveltekit bash -i -c "npm run stylelint:local"
+  format_all:
+    desc: '全てのファイルに関してコードフォーマットを実行'
+    cmds:
+      - docker compose exec sveltekit bash -i -c "npm run format"
+      - docker compose exec sveltekit bash -i -c "npm run stylelint:fix"
+  check:
+    desc: 'svelte-check実行'
+    cmds:
+      - docker compose exec sveltekit bash -i -c "npm run check"
+  check-watch:
+    desc: 'svelte-check --watch実行'
+    cmds:
+      - docker compose exec sveltekit bash -i -c "npm run check:watch"
+  rebuild:
+    desc: 'コンテナの再構築'
+    cmds:
+      - docker compose build --no-cache
+  api_build:
+    desc: 'Aspidaのビルド'
+    cmds:
+      - docker compose exec sveltekitt bash -i -c "npm run api:build"

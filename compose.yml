@@ -1,0 +1,16 @@
+services:
+  sveltekit:
+    build:
+      context: .
+      dockerfile: local.Dockerfile
+    ports:
+      - 3000:80
+      - 9008:9008
+    volumes:
+      - .:/app
+      - /app/node_modules
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sveltekit.rule=Host(`localhost`)"
+      - "traefik.http.routers.sveltekit.entrypoints=web"
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

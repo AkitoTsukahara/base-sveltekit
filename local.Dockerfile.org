@@ -1,0 +1,27 @@
+FROM ubuntu:focal-20240427
+
+# NOTE: Gitを導入するためにタイムゾーンを設定
+RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+
+RUN apt-get update && \
+    apt-get install -y curl bash git unzip jq zstd xdg-utils
+
+SHELL [ "/bin/bash", "-c" ]
+
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+
+# NOTE: nodejsのバージョンを変えるときはここを変える
+ARG NODE_VERSION=20.11.1
+
+# NOTE: nvmを使ってnodeを入れる
+RUN . $HOME/.nvm/nvm.sh && \
+    nvm install $NODE_VERSION && \
+    nvm use $NODE_VERSION && \
+    nvm alias default $NODE_VERSION
+
+RUN apt-get update && . $HOME/.nvm/nvm.sh
+
+# NOTE: ブラウザ依存ライブラリのインストール
+RUN apt-get update && . $HOME/.nvm/nvm.sh && npx playwright@1.47.2 install --with-deps
+
+WORKDIR /code
